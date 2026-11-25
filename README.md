@@ -47,7 +47,7 @@ cd apps/web
 npm install
 npm run dev
 ~~~
-Vite proxies /api to the local Laravel server. For a separately hosted API, set VITE_API_URL to its versioned API base URL (for example, https://api.example.com/api/v1) before building.
+Vite proxies /api to the local Laravel server. For a separately hosted API, set VITE_API_URL to its versioned API base URL (for example, https://api.example.com/api/v1) before building, and set FRONTEND_URL in the API environment to the exact web-app origin so the API CORS policy allows that client.
 
 ### 3. Create your account
 Open the Vite URL, register with your name, email, and a password of at least 10 characters, then add your first lead. Registration creates a sales account. To promote a trusted workspace owner to admin, update their users.role value through a secure database/admin process. Never expose role assignment in public registration.
