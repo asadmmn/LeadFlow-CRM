@@ -2,50 +2,53 @@
 
 A modern, self-hostable CRM for small teams to capture leads, manage a sales pipeline, schedule follow-ups, and understand sales performance.
 
-> **Project status:** Foundation in progress. The repository is being built as a production-minded portfolio project, not a screenshot-only demo.
+> **Status:** Initial application foundation committed. Authentication, activity/task workflows, and API-to-UI integration remain on the roadmap.
 
-## Product goals
+## Stack
+- **Backend:** Laravel 11, PHP 8.2+, Laravel Sanctum
+- **Frontend:** React 18, TypeScript, Vite, Bootstrap 5
+- **Database:** MySQL 8+ (SQLite is suitable for local tests)
+- **Automation:** GitHub Actions
 
-- Centralize contacts, companies, and lead activity.
-- Move opportunities through a configurable sales pipeline.
-- Record calls, notes, meetings, and follow-up tasks.
-- Provide a clear dashboard for pipeline health and team activity.
-- Expose a documented REST API with validation, authorization, and automated tests.
-
-## Planned stack
-
-- **Backend:** Laravel, PHP 8.3+, Laravel Sanctum
-- **Frontend:** React, TypeScript, Vite, Bootstrap
-- **Database:** MySQL 8+
-- **Quality:** PHPUnit/Pest, ESLint, TypeScript checks, GitHub Actions
-
-## Planned modules
-
-1. Authentication and user profiles
-2. Leads, contacts, and companies
-3. Pipeline stages and opportunity tracking
-4. Activities, notes, and follow-up tasks
-5. Dashboard metrics and reporting
-6. API documentation and deployment guide
+## Current foundation
+- Responsive CRM dashboard with pipeline metrics and recent leads.
+- Search and status filtering in the lead table.
+- Add-lead interaction with client-side state.
+- Laravel REST endpoints for lead listing, creation, viewing, updating, and deletion.
+- Server-side validation, pagination, soft deletes, and feature tests.
+- Architecture notes and CI workflow.
 
 ## Repository layout
-
 ```
-apps/
-  api/       Laravel application
-  web/       React + TypeScript application
-docs/        Architecture and product documentation
-.github/     CI workflows and contribution templates
+apps/api/   Laravel JSON API
+apps/web/   React + TypeScript dashboard
+docs/       Architecture and product documentation
+.github/    CI workflows
 ```
 
-## Development
+## Run the frontend
+```bash
+cd apps/web
+npm install
+npm run dev
+```
 
-The application setup instructions will be added alongside the backend and frontend scaffolds. See [docs/architecture.md](docs/architecture.md) for the initial design.
+## Run the API
+```bash
+cd apps/api
+composer install
+cp .env.example .env
+php artisan key:generate
+# Configure DB_* in .env, then:
+php artisan migrate
+php artisan test
+php artisan serve
+```
 
-## Security
+The API is available at `http://127.0.0.1:8000/api/v1`.
 
-Never commit credentials, API keys, production data, or real customer information. Use environment variables and the provided example environment files.
+## Security note
+This is an early development foundation. Authentication and authorization are not yet wired into the API; do not expose it to the public internet or use it with real customer data until those controls are implemented.
 
 ## License
-
-MIT. See [LICENSE](LICENSE).
+MIT.
