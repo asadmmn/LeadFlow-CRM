@@ -28,7 +28,7 @@ apps/web/ — React + TypeScript dashboard
 docs/ — Architecture, product documentation, and the static showcase at `docs/demo/`  
 .github/ — CI workflows
 
-## Local setup
+## Public showcase\nThe static, no-login product preview is published at **https://asadmmn.github.io/LeadFlow-CRM/**. It uses illustrative sample data and does not connect to a production database. The Pages workflow deploys the `docs/` folder whenever changes are pushed to `main`. Enable **Settings → Pages → Build and deployment → Source: GitHub Actions** if Pages is not already enabled for this repository.\n\n## Local setup
 
 ### 1. API
 ~~~bash
@@ -75,7 +75,7 @@ CI runs the frontend TypeScript/Vite production build and Laravel feature tests 
 | GET | /api/v1/leads/{id} | Authenticated | View own lead |
 | PATCH | /api/v1/leads/{id} | Admin/sales | Update own lead |
 | DELETE | /api/v1/leads/{id} | Admin/sales | Soft-delete own lead |
-| GET | /api/v1/dashboard/stats | Authenticated | Live dashboard metrics |\n| GET/POST | /api/v1/tasks | Authenticated / admin-sales for writes | List and create follow-up tasks |\n| PATCH/DELETE | /api/v1/tasks/{id} | Admin/sales | Update or delete a task |\n| GET/POST | /api/v1/leads/{id}/activities | Authenticated / admin-sales for writes | Read and add lead timeline events |
+| GET | /api/v1/dashboard/stats | Authenticated | Live dashboard metrics |\n| GET | /api/v1/tasks | Authenticated | List own tasks; supports status and overdue filters |\n| POST | /api/v1/tasks | Admin/sales | Create a task for an owned lead |\n| PATCH | /api/v1/tasks/{id} | Admin/sales | Update task or mark complete |\n| DELETE | /api/v1/tasks/{id} | Admin/sales | Delete own task |\n| GET | /api/v1/leads/{id}/activities | Authenticated | Read a lead activity timeline |\n| POST | /api/v1/leads/{id}/activities | Admin/sales | Add a note, call, email or meeting activity |\n| GET/POST | /api/v1/tasks | Authenticated / admin-sales for writes | List and create follow-up tasks |\n| PATCH/DELETE | /api/v1/tasks/{id} | Admin/sales | Update or delete a task |\n| GET/POST | /api/v1/leads/{id}/activities | Authenticated / admin-sales for writes | Read and add lead timeline events |
 
 Send the login token as Authorization: Bearer <token>. Search and status filters are supported as query parameters. List responses use Laravel pagination.
 
