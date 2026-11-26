@@ -7,7 +7,7 @@ export type Lead = {
   email: string | null; phone: string | null; source: string | null; status: LeadStatus;
   value: string | number | null; notes?: string | null; follow_up_at?: string | null;
 };
-export type Stats = {
+export type Task = { id: number; title: string; description: string | null; due_at: string | null; completed_at: string | null; lead_id: number | null; lead?: { id: number; first_name: string; last_name: string | null; company: string | null } | null };\n\nexport type Stats = {
   total_leads: number; pipeline_value: number; won_value: number; open_leads: number;
   won_leads: number; conversion_rate: number; stages: Record<LeadStatus, number>;
 };
@@ -46,5 +46,5 @@ export const api = {
   stats: () => request<Stats>('/dashboard/stats'),
   createLead: (data: Partial<Lead> & { first_name: string }) => request<{ data: Lead }>('/leads', { method: 'POST', body: JSON.stringify(data) }),
   updateLead: (id: number, data: Partial<Lead>) => request<{ data: Lead }>(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-  deleteLead: (id: number) => request<void>(`/leads/${id}`, { method: 'DELETE' }),
+  deleteLead: (id: number) => request<void>(`/leads/${id}`, { method: 'DELETE' }),\n  tasks: () => request<{ data: Task[] }>('/tasks'),\n  createTask: (data: { title: string; due_at?: string | null; lead_id?: number | null }) => request<{ data: Task }>('/tasks', { method: 'POST', body: JSON.stringify(data) }),\n  updateTask: (id: number, data: { completed?: boolean }) => request<{ data: Task }>(`/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),\n  deleteTask: (id: number) => request<void>(`/tasks/${id}`, { method: 'DELETE' }),
 };
