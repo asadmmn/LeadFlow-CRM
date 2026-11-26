@@ -11,7 +11,10 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [stats, setStats] = useState<Stats | null>(null);\n  const [tasks, setTasks] = useState<Task[]>([]);\n  const [taskTitle, setTaskTitle] = useState('');\n  const [taskDue, setTaskDue] = useState('');
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDue, setTaskDue] = useState('');
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -21,9 +24,10 @@ function App() {
   const canManage = user?.role === 'admin' || user?.role === 'sales';
 
   const refresh = useCallback(async () => {
-    const [leadResult, statResult] = await Promise.all([api.leads(query, filter), api.stats()]);
+    const [leadResult, statResult, taskResult] = await Promise.all([api.leads(query, filter), api.stats(), api.tasks()]);
     setLeads(leadResult.data);
     setStats(statResult);
+    setTasks(taskResult.data);
   }, [query, filter]);
 
   useEffect(() => {
@@ -66,7 +70,15 @@ function App() {
     finally { setBusy(false); }
   }
 
-  async function addTask(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault(); setBusy(true); setError('');\n    try { await api.createTask({ title: taskTitle, due_at: taskDue ? new Date(taskDue).toISOString() : null }); setTaskTitle(''); setTaskDue(''); await refresh(); }\n    catch (reason) { setError((reason as Error).message); } finally { setBusy(false); }\n  }\n\n  async function toggleTask(task: Task) { try { await api.updateTask(task.id, { completed: !task.completed_at }); await refresh(); } catch (reason) { setError((reason as Error).message); } }\n\n  async function changeStatus(lead: Lead, status: LeadStatus) {
+  async function addTask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setBusy(true); setError('');
+    try { await api.createTask({ title: taskTitle, due_at: taskDue ? new Date(taskDue).toISOString() : null }); setTaskTitle(''); setTaskDue(''); await refresh(); }
+    catch (reason) { setError((reason as Error).message); } finally { setBusy(false); }
+  }
+
+  async function toggleTask(task: Task) { try { await api.updateTask(task.id, { completed: !task.completed_at }); await refresh(); } catch (reason) { setError((reason as Error).message); } }
+
+  async function changeStatus(lead: Lead, status: LeadStatus) {
     setError('');
     try { await api.updateLead(lead.id, { status }); await refresh(); }
     catch (reason) { setError((reason as Error).message); }
