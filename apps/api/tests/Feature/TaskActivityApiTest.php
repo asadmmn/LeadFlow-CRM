@@ -29,7 +29,7 @@ class TaskActivityApiTest extends TestCase
         $taskId = $user->tasks()->firstOrFail()->id;
         $this->patchJson("/api/v1/tasks/{$taskId}", ['status' => 'completed'])
             ->assertOk()->assertJsonPath('data.status', 'completed');
-        $this->getJson('/api/v1/tasks?status=completed')->assertOk()->assertJsonPath('data.0.title', 'Send proposal');
+        $this->getJson('/api/v1/tasks?status=done')->assertOk()->assertJsonPath('data.0.title', 'Send proposal');
     }
 
     public function test_tasks_cannot_be_created_for_another_users_lead_or_accessed_by_another_user(): void
@@ -49,11 +49,11 @@ class TaskActivityApiTest extends TestCase
         Sanctum::actingAs($user);
 
         $this->postJson("/api/v1/leads/{$lead->id}/activities", [
-            'type' => 'call', 'subject' => 'Discovery call', 'body' => 'Discussed project requirements.',
+            'type' => 'call', 'title' => 'Discovery call', 'body' => 'Discussed project requirements.',
         ])->assertCreated()->assertJsonPath('data.type', 'call');
 
         $this->getJson("/api/v1/leads/{$lead->id}/activities")
-            ->assertOk()->assertJsonPath('data.0.subject', 'Discovery call');
+            ->assertOk()->assertJsonPath('data.0.title', 'Discovery call');
     }
 
     public function test_viewer_can_read_tasks_but_cannot_create_or_log_activities(): void
@@ -65,6 +65,6 @@ class TaskActivityApiTest extends TestCase
 
         $this->getJson('/api/v1/tasks')->assertOk();
         $this->postJson('/api/v1/tasks', ['lead_id' => $lead->id, 'title' => 'Blocked'])->assertForbidden();
-        $this->postJson("/api/v1/leads/{$lead->id}/activities", ['type' => 'note', 'subject' => 'Blocked'])->assertForbidden();
+        $this->postJson("/api/v1/leads/{$lead->id}/activities", ['type' => 'note', 'title' => 'Blocked'])->assertForbidden();
     }
 }
