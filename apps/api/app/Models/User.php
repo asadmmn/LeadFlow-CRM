@@ -25,4 +25,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Lead::class);
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function leadActivities(): HasMany
+    {
+        return $this->hasMany(LeadActivity::class);
+    }
 }
