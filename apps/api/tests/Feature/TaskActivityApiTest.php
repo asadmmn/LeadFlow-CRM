@@ -27,8 +27,8 @@ class TaskActivityApiTest extends TestCase
         ])->assertCreated()->assertJsonPath('data.title', 'Send proposal');
 
         $taskId = $user->tasks()->firstOrFail()->id;
-        $this->patchJson("/api/v1/tasks/{$taskId}", ['status' => 'completed'])
-            ->assertOk()->assertJsonPath('data.status', 'completed');
+        $this->patchJson("/api/v1/tasks/{$taskId}", ['status' => 'done'])
+            ->assertOk()->assertJsonPath('data.status', 'done');
         $this->getJson('/api/v1/tasks?status=done')->assertOk()->assertJsonPath('data.0.title', 'Send proposal');
     }
 
