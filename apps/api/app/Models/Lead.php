@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Lead extends Model
 {
@@ -11,10 +12,15 @@ class Lead extends Model
 
     public const STATUSES = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
 
-    protected $fillable = ['first_name', 'last_name', 'company', 'email', 'phone', 'source', 'status', 'value', 'notes', 'follow_up_at'];
+    protected $fillable = ['user_id', 'first_name', 'last_name', 'company', 'email', 'phone', 'source', 'status', 'value', 'notes', 'follow_up_at'];
 
     protected function casts(): array
     {
         return ['value' => 'decimal:2', 'follow_up_at' => 'datetime'];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -10,9 +10,9 @@ use Illuminate\Validation\Rule;
 
 class LeadController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $leads = Lead::query()
+        $leads = $request->user()->leads()
             ->when($request->filled('search'), function ($query) use ($request): void {
                 $term = '%'.$request->string('search')->toString().'%';
                 $query->where(fn ($q) => $q->where('first_name', 'like', $term)
@@ -21,13 +21,31 @@ class LeadController extends Controller
                     ->orWhere('email', 'like', $term));
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->toString()))
-            ->latest()->paginate(min(max($request->integer('per_page', 15), 1), 100));
+            ->latest()->paginate(min(max($request->integer('per_page', 50), 1), 100));
 
         return response()->json($leads);
     }
 
+    public function stats(Request $request): JsonResponse
+    {
+        $query = $request->user()->leads();
+        $leads = (clone $query)->get();
+        $open = $leads->whereNotIn('status', ['won', 'lost']);
+
+        return response()->json([
+            'total_leads' => $leads->count(),
+            'pipeline_value' => (float) $open->sum('value'),
+            'won_value' => (float) $leads->where('status', 'won')->sum('value'),
+            'open_leads' => $open->count(),
+            'won_leads' => $leads->where('status', 'won')->count(),
+            'conversion_rate' => $leads->count() ? round($leads->where('status', 'won')->count() / $leads->count() * 100, 1) : 0,
+            'stages' => collect(Lead::STATUSES)->mapWithKeys(fn ($status) => [$status => $leads->where('status', $status)->count()]),
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
+        $this->ensureCanManage($request);
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],
@@ -41,16 +59,18 @@ class LeadController extends Controller
             'follow_up_at' => ['nullable', 'date'],
         ]);
 
-        return response()->json(['data' => Lead::create($validated)], 201);
+        return response()->json(['data' => $request->user()->leads()->create($validated)], 201);
     }
 
-    public function show(Lead $lead): JsonResponse
+    public function show(Request $request, int $lead): JsonResponse
     {
-        return response()->json(['data' => $lead]);
+        return response()->json(['data' => $request->user()->leads()->findOrFail($lead)]);
     }
 
-    public function update(Request $request, Lead $lead): JsonResponse
+    public function update(Request $request, int $lead): JsonResponse
     {
+        $this->ensureCanManage($request);
+        $record = $request->user()->leads()->findOrFail($lead);
         $validated = $request->validate([
             'first_name' => ['sometimes', 'required', 'string', 'max:100'],
             'last_name' => ['sometimes', 'nullable', 'string', 'max:100'],
@@ -64,13 +84,19 @@ class LeadController extends Controller
             'follow_up_at' => ['sometimes', 'nullable', 'date'],
         ]);
 
-        $lead->update($validated);
-        return response()->json(['data' => $lead->refresh()]);
+        $record->update($validated);
+        return response()->json(['data' => $record->refresh()]);
     }
 
-    public function destroy(Lead $lead): JsonResponse
+    public function destroy(Request $request, int $lead): JsonResponse
     {
-        $lead->delete();
+        $this->ensureCanManage($request);
+        $request->user()->leads()->findOrFail($lead)->delete();
         return response()->json(status: 204);
+    }
+
+    private function ensureCanManage(Request $request): void
+    {
+        abort_unless(in_array($request->user()->role, ['admin', 'sales'], true), 403, 'Your role cannot modify leads.');
     }
 }
