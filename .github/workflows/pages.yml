@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/demo/**'
+      - 'docs/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -31,7 +31,7 @@ jobs:
       - name: Upload showcase
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/demo
+          path: docs
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
