@@ -14,7 +14,7 @@ class LeadApiTest extends TestCase
 
     private function user(string $email = 'owner@example.test'): User
     {
-        return User::create(['name' => 'Workspace Owner', 'email' => $email, 'password' => 'long-test-password']);
+        return User::create(['name' => 'Workspace Owner', 'email' => $email, 'password' => 'long-test-password', 'role' => 'sales']);
     }
 
     public function test_health_endpoint_returns_ok(): void
