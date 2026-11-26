@@ -21,8 +21,7 @@ class User extends Authenticatable
         return ['email_verified_at' => 'datetime', 'password' => 'hashed'];
     }
 
-    public function leads(): HasMany
-    {
-        return $this->hasMany(Lead::class);
-    }
+    public function leads(): HasMany { return $this->hasMany(Lead::class); }
+    public function tasks(): HasMany { return $this->hasMany(Task::class); }
+    public function activities(): HasMany { return $this->hasMany(LeadActivity::class); }
 }
