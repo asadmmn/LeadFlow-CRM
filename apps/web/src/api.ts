@@ -7,6 +7,8 @@ export type Lead = {
   email: string | null; phone: string | null; source: string | null; status: LeadStatus;
   value: string | number | null; notes?: string | null; follow_up_at?: string | null;
 };
+export type Task = { id:number; lead_id:number; title:string; description:string|null; priority:'low'|'medium'|'high'; status:'open'|'done'; due_at:string|null; completed_at:string|null; lead?:Pick<Lead,'id'|'first_name'|'last_name'|'company'> };
+export type LeadActivity = { id:number; lead_id:number; type:'note'|'call'|'email'|'meeting'|'status'; title:string; body:string|null; occurred_at:string };
 export type Stats = {
   total_leads: number; pipeline_value: number; won_value: number; open_leads: number;
   won_leads: number; conversion_rate: number; stages: Record<LeadStatus, number>;
@@ -47,4 +49,10 @@ export const api = {
   createLead: (data: Partial<Lead> & { first_name: string }) => request<{ data: Lead }>('/leads', { method: 'POST', body: JSON.stringify(data) }),
   updateLead: (id: number, data: Partial<Lead>) => request<{ data: Lead }>(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteLead: (id: number) => request<void>(`/leads/${id}`, { method: 'DELETE' }),
+  tasks: (status = '') => request<{ data: Task[] }>(`/tasks?per_page=100${status ? `&status=${encodeURIComponent(status)}` : ''}`),
+  createTask: (data: { lead_id:number; title:string; description?:string; priority:'low'|'medium'|'high'; due_at?:string }) => request<{ data:Task }>('/tasks', { method:'POST', body:JSON.stringify(data) }),
+  updateTask: (id:number, data:Partial<Pick<Task,'title'|'description'|'priority'|'status'|'due_at'>>) => request<{ data:Task }>(`/tasks/${id}`, { method:'PATCH', body:JSON.stringify(data) }),
+  deleteTask: (id:number) => request<void>(`/tasks/${id}`, { method:'DELETE' }),
+  activities: (leadId:number) => request<{ data:LeadActivity[] }>(`/leads/${leadId}/activities`),
+  createActivity: (leadId:number, data:{ type:LeadActivity['type']; title:string; body?:string }) => request<{ data:LeadActivity }>(`/leads/${leadId}/activities`, { method:'POST', body:JSON.stringify(data) }),
 };
